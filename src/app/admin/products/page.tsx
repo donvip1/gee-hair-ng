@@ -1,0 +1,6 @@
+import Image from "next/image";
+import { AdminNav } from "@/components/AdminNav";
+import { products } from "@/lib/products";
+import { formatNaira } from "@/lib/business";
+
+export default function AdminProductsPage() { return <div className="admin-shell"><AdminNav /><section className="admin-content"><div className="app-page-header"><div><p className="eyebrow">Catalog management</p><h1>Products.</h1></div><button className="button button-dark">+ Add product</button></div><table className="data-table"><thead><tr><th>Product</th><th>Category</th><th>Starting price</th><th>Stock</th><th>Action</th></tr></thead><tbody>{products.map((product) => <tr key={product.id}><td><div style={{ display: "flex", alignItems: "center", gap: 12 }}><Image src={product.image} width={42} height={52} alt="" /> <strong>{product.name}</strong></div></td><td>{product.category}</td><td>{formatNaira(product.basePrice)}</td><td>{product.variants.reduce((sum, variant) => sum + variant.stock, 0)}</td><td><button className="pill">Edit</button></td></tr>)}</tbody></table><div className="auth-card" style={{ marginTop: 30 }}><h2>Connect the backend</h2><p>Once Apps Script is deployed, this page can create, edit and archive Sheet-backed products and upload compressed images to the configured Google Drive folder.</p></div></section></div>; }

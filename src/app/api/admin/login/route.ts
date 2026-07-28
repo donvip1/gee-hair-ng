@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { timingSafeEqual } from "node:crypto";
+import { adminCookie, createAdminToken } from "@/lib/admin-auth";
 
 const attempts = new Map<string, { count: number; reset: number }>();
 
@@ -16,11 +17,8 @@ export async function POST(request: NextRequest) {
   }
   attempts.delete(ip);
   const secret = process.env.SESSION_SECRET ?? expected;
-  const expires = Date.now() + 8 * 60 * 60_000;
-  const payload = `admin:${expires}`;
-  const signature = createHmac("sha256", secret).update(payload).digest("hex");
   const response = NextResponse.json({ ok: true });
-  response.cookies.set("gee_admin", `${payload}.${signature}`, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 8 * 60 * 60 });
+  response.cookies.set(adminCookie, createAdminToken(secret), { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 8 * 60 * 60 });
   return response;
 }
 

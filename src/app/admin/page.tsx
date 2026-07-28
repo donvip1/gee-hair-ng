@@ -1,12 +1,15 @@
+import Link from "next/link";
+import { ImageOff, PackageCheck, Plus } from "lucide-react";
 import { AdminNav } from "@/components/AdminNav";
-import { products } from "@/lib/products";
+import { getPublicCatalog } from "@/lib/catalog-backend";
 
-const recentOrders = [
-  { reference: "GH-48219364", customer: "Amara O.", total: "₦205,000", status: "Preparing" },
-  { reference: "GH-10472856", customer: "Nneka C.", total: "₦145,000", status: "Confirmed" },
-  { reference: "GH-91836271", customer: "Kemi A.", total: "₦285,000", status: "Received" }
-];
+export const dynamic = "force-dynamic";
 
-export default function AdminPage() {
-  return <div className="admin-shell"><AdminNav /><section className="admin-content"><p className="eyebrow">Store overview</p><h1>Good afternoon, <em>Gee.</em></h1><div className="stat-grid"><div className="stat-card"><span>Active products</span><strong>{products.length}</strong></div><div className="stat-card"><span>New orders</span><strong>3</strong></div><div className="stat-card"><span>Low stock</span><strong>2</strong></div><div className="stat-card"><span>Wishlisted</span><strong>18</strong></div></div><h2 style={{ fontSize: 38, marginBottom: 20 }}>Recent orders</h2><table className="data-table"><thead><tr><th>Reference</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>{recentOrders.map((order) => <tr key={order.reference}><td>{order.reference}</td><td>{order.customer}</td><td>{order.total}</td><td><span className="status-chip">{order.status}</span></td></tr>)}</tbody></table><p style={{ color: "#716a62", marginTop: 20, fontSize: 12 }}>Demo data is shown until the Google Apps Script backend is connected.</p></section></div>;
+export default async function AdminPage() {
+  const { products, source } = await getPublicCatalog();
+  const active = products.filter((product) => product.active);
+  const pendingImages = active.filter((product) => product.imagePending);
+  const catalogLabel = source === "live" ? "live catalog" : "verified fallback catalog";
+
+  return <div className="admin-shell"><AdminNav /><section className="admin-content"><p className="eyebrow">Catalog overview</p><h1>Good to see you, <em>Gee.</em></h1><p className="admin-intro">This dashboard manages only real products in the public catalog. Customer enquiries and transactions continue directly on WhatsApp.</p><div className="stat-grid admin-stat-grid"><div className="stat-card"><PackageCheck /><span>Visible products</span><strong>{active.length}</strong><p>Products currently available in the {catalogLabel}.</p></div><div className="stat-card"><ImageOff /><span>Photos needed</span><strong>{pendingImages.length}</strong><p>{pendingImages.length ? pendingImages.map((product) => product.name).join(", ") : "Every product has an image."}</p></div></div><div className="admin-action-panel"><div><p className="eyebrow">Product management</p><h2>Add, edit or remove catalog items.</h2><p>{source === "live" ? "Changes made in product management update the public storefront." : "Connect Google Apps Script and Drive to make changes live from this dashboard. Until then, the verified five-product catalog remains available for preview."}</p></div><Link className="button button-dark" href="/admin/products"><Plus size={17} /> Manage products</Link></div></section></div>;
 }

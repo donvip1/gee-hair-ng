@@ -1,10 +1,4 @@
-export type ProductCategory = "Bone Straight" | "Curls" | "Wigs" | "Bundles";
-
-export type ProductVariant = {
-  label: string;
-  price: number;
-  stock: number;
-};
+export type ProductCategory = "Straight" | "Curls" | "Waves";
 
 export type Product = {
   id: string;
@@ -16,32 +10,22 @@ export type Product = {
   details: string[];
   image: string;
   images: string[];
-  basePrice: number;
-  variants: ProductVariant[];
+  minLength: number;
+  maxLength: number;
+  lengthStep: number;
+  colours: string;
+  bundleWeightGrams: number;
   featured: boolean;
-  badge?: string;
+  active: boolean;
+  imagePending?: boolean;
+  updatedAt?: string;
 };
 
-export type CartItem = {
-  key: string;
-  productId: string;
-  slug: string;
-  name: string;
-  image: string;
-  variant: string;
-  unitPrice: number;
-  quantity: number;
+export type ProductInput = Omit<Product, "id" | "updatedAt"> & {
+  id?: string;
 };
 
-export type OrderStatus = "Received" | "Confirmed" | "Preparing" | "Dispatched" | "Delivered" | "Cancelled";
-
-export type Order = {
-  reference: string;
-  email: string;
-  phone: string;
-  customerName: string;
-  status: OrderStatus;
-  total: number;
-  createdAt: string;
-  items: CartItem[];
+export type CatalogResponse = {
+  products: Product[];
+  source: "live" | "fallback";
 };

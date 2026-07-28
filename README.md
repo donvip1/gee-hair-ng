@@ -1,6 +1,22 @@
-# Gee Hair NG — Next.js Commerce Web App
+# Gee Hair NG — WhatsApp Commerce Web App
 
-A mobile-first luxury hair storefront and installable web app built with Next.js, React, and TypeScript. It includes a searchable catalog, product variants, persistent cart and wishlist, WhatsApp checkout, email-code account UI, order tracking, admin dashboard, PWA support, and a Google Apps Script backend package.
+**Beauty delivered, Confidence unleashed.**
+
+A mobile-first Next.js, React and TypeScript catalog for Gee Hair NG. Customers browse verified products, choose inches, colour and number of 100g bundles, request complimentary first-time wigging, and send the complete selection directly to the official WhatsApp number.
+
+## What is real in this release
+
+- Five actual product entries: Bone Straight, Pixie Curls, Bouncy Curls, Deep Waves and Jerry Curls.
+- Four authentic client product photographs; Jerry Curls has a clearly labelled branded placeholder until its photograph is supplied.
+- Verified business details:
+  - WhatsApp: `+234 805 558 9586`
+  - Email: `geeofficialng@gmail.com`
+  - Facebook page name: `Hair Addict`
+- 100% virgin hair, 100g per bundle, all colours available.
+- Complimentary wigging for first-time customers.
+- Price on request; Gee confirms price, availability, delivery and payment on WhatsApp.
+
+There are no fake customer accounts, order tracking records, checkout transactions, orders, sales statistics, reviews or inventory values in the app.
 
 ## Run locally
 
@@ -14,61 +30,53 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-The app can run in preview mode without the backend. Product data is currently seeded in `src/lib/products.ts`; the shown names and prices are samples because the supplied WhatsApp screenshots did not contain a real catalog or prices.
+## Preview without the admin backend
 
-## Google Sheets + Apps Script backend
+The storefront works immediately with the verified fallback catalog in `src/lib/products.ts`. Google Apps Script is not involved in any customer transaction. If the admin backend has not been connected, `/admin/products` opens in read-only preview mode and explains what must be configured.
 
-1. Create a Google Sheet for the store and copy its ID from the URL.
+Set an admin password before using `/admin`:
+
+```env
+ADMIN_PASSWORD=replace-with-a-strong-password
+SESSION_SECRET=replace-with-a-different-long-random-secret
+```
+
+## Enable owner product management
+
+The owner dashboard can add, edit and delete products and upload images. Google Sheets stores product data and Google Drive stores uploaded images.
+
+1. Create a Google Sheet and copy its ID from the URL.
 2. Create a Google Drive folder for product photos and copy its folder ID.
-3. Open [script.google.com](https://script.google.com), create a project, and add the files from `google-apps-script/`:
-   - paste `Code.js` into the script editor;
-   - copy the settings from `appsscript.json` into the project manifest.
-4. In **Project Settings → Script Properties**, add:
-   - `SPREADSHEET_ID`: the Google Sheet ID;
-   - `DRIVE_FOLDER_ID`: the Google Drive folder ID;
-   - `SHARED_SECRET`: a long random value that will also be stored in Vercel;
-   - `OTP_SALT`: another long random value used to hash one-time codes.
-5. In the Apps Script editor, run `setupStore` once and approve the requested Sheet, Drive, and email permissions. It creates the `Products`, `Users`, `Otps`, `Wishlists`, `Orders`, and `Settings` tabs.
-6. Choose **Deploy → New deployment → Web app**:
+3. Create a project at [script.google.com](https://script.google.com).
+4. Paste `google-apps-script/Code.js` into the Apps Script editor and copy the settings from `google-apps-script/appsscript.json` into the manifest.
+5. Add these **Script Properties**:
+   - `SPREADSHEET_ID`: Google Sheet ID
+   - `DRIVE_FOLDER_ID`: Google Drive folder ID
+   - `SHARED_SECRET`: a long random value; use the same value in Vercel
+6. Run `setupCatalog` once and approve Sheet and Drive permissions. It creates the Products tab and headers.
+7. Deploy as a **Web app**:
    - Execute as: **Me**
    - Who has access: **Anyone**
-7. Copy the `/exec` deployment URL.
-8. Set `GOOGLE_APPS_SCRIPT_URL` and the matching `APPS_SCRIPT_SHARED_SECRET` in `.env.local` and in Vercel.
+8. Copy the `/exec` URL and add these server-only values to Vercel:
 
-Apps Script `MailApp` has daily sending quotas. Email OTP login is suitable for a small first release; monitor the quota as the store grows.
+```env
+GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+APPS_SCRIPT_SHARED_SECRET=the-same-long-random-value
+```
 
-## Admin dashboard
+The shared secret is used only between Vercel route handlers and Apps Script. It is never exposed to browsers. The admin session is checked on the page and on every product or upload API request.
 
-Set these private server environment variables:
+## Deploy on Vercel
 
-- `ADMIN_PASSWORD`: strong password used at `/admin/login`;
-- `SESSION_SECRET`: separate random secret used to sign admin cookies.
+1. Import `https://github.com/donvip1/gee-hair-ng` into Vercel.
+2. Set `ADMIN_PASSWORD` and `SESSION_SECRET` for the preview deployment.
+3. Deploy. The customer catalog and WhatsApp ordering work without Apps Script.
+4. Add the Apps Script variables later when the owner dashboard should become writable.
 
-The dashboard routes are protected by a signed, secure, HTTP-only cookie. Five failed login attempts from one IP are paused for 15 minutes. For a larger team, replace password login with Google Workspace identity/allowlisting.
-
-## Deploy free on Vercel
-
-1. Push this folder to a GitHub repository.
-2. Sign in to Vercel and choose **Add New → Project**.
-3. Import the repository. Vercel detects Next.js automatically.
-4. Add the four environment variables from `.env.example` under **Project Settings → Environment Variables**.
-5. Deploy. No custom build command is required.
-6. After deployment, install the app from the browser’s **Add to Home Screen / Install App** option.
-
-## Important production notes
-
-- Replace sample Unsplash photography with the client’s licensed product photography before launch.
-- Replace the sample catalog and prices in `src/lib/products.ts`, or finish wiring the admin product actions to `listProducts`/`saveProduct` in Apps Script.
-- The backend endpoints already support orders, tracking, OTPs, products, settings, order status changes, and Drive uploads. The customer order and tracking flows call the backend proxy today; remaining admin buttons are intentionally presented as UI until the owner’s Sheet and Drive IDs are connected.
-- Checkout creates an order reference and opens WhatsApp with a complete order summary. It does not collect online payment.
-- Use the exact client details verified from the screenshots: Gee Hair NG, +234 803 558 9586, Karsana in the Federal Capital Territory, 07:00–23:00 daily, and `ochijegoodness9@gmail.com`.
-
-## Commands
+## Checks
 
 ```bash
-npm run dev
-npm run lint
 npm run typecheck
+npm run lint
 npm run build
-npm start
 ```

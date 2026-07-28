@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-labelledby="title description">
+  <title id="title">Jerry Curls photo coming soon</title>
+  <desc id="description">Gee Hair NG branded placeholder for Jerry Curls</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4f171c"/><stop offset="1" stop-color="#171512"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="35%" r="60%"><stop stop-color="#c88162" stop-opacity=".38"/><stop offset="1" stop-color="#4f171c" stop-opacity="0"/></radialGradient>
+    <pattern id="curl" width="110" height="110" patternUnits="userSpaceOnUse"><path d="M22 63c0-32 52-32 52 0 0 25-38 25-38 0 0-16 24-16 24 0" fill="none" stroke="#f5f0e8" stroke-opacity=".08" stroke-width="6" stroke-linecap="round"/></pattern>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect width="900" height="1200" fill="url(#glow)"/>
+  <rect width="900" height="1200" fill="url(#curl)"/>
+  <circle cx="450" cy="430" r="178" fill="none" stroke="#e7cbb9" stroke-opacity=".5" stroke-width="2"/>
+  <circle cx="450" cy="430" r="145" fill="#f5f0e8" fill-opacity=".05" stroke="#f5f0e8" stroke-opacity=".18"/>
+  <text x="450" y="470" text-anchor="middle" fill="#f5f0e8" font-family="Georgia, serif" font-size="170">G</text>
+  <text x="450" y="725" text-anchor="middle" fill="#f5f0e8" font-family="Georgia, serif" font-size="68">Jerry Curls</text>
+  <text x="450" y="785" text-anchor="middle" fill="#d9b49f" font-family="Arial, sans-serif" font-size="22" letter-spacing="8">PHOTO COMING SOON</text>
+  <line x1="310" y1="842" x2="590" y2="842" stroke="#d9b49f" stroke-opacity=".55"/>
+  <text x="450" y="900" text-anchor="middle" fill="#f5f0e8" font-family="Arial, sans-serif" font-size="24">10–34 inches · All colours</text>
+  <text x="450" y="1060" text-anchor="middle" fill="#d9b49f" font-family="Arial, sans-serif" font-size="18" letter-spacing="5">BEAUTY DELIVERED</text>
+  <text x="450" y="1095" text-anchor="middle" fill="#d9b49f" font-family="Arial, sans-serif" font-size="18" letter-spacing="5">CONFIDENCE UNLEASHED</text>
+</svg>

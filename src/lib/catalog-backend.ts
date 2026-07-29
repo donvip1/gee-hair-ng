@@ -1,5 +1,5 @@
 import { products as fallbackProducts } from "@/lib/products";
-import type { CatalogResponse, Product } from "@/lib/types";
+import type { CatalogHealth, CatalogResponse, Product } from "@/lib/types";
 
 const backendUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
 const sharedSecret = process.env.APPS_SCRIPT_SHARED_SECRET;
@@ -19,6 +19,10 @@ export async function callCatalogBackend<T>(action: string, payload: Record<stri
   try { data = JSON.parse(text); } catch { throw new Error("The catalog backend returned an invalid response."); }
   if (!response.ok || !isBackendSuccess(data)) throw new Error(isBackendError(data) ? data.error : "Catalog request failed.");
   return data as T;
+}
+
+export async function getCatalogHealth() {
+  return callCatalogBackend<CatalogHealth>("healthCheck");
 }
 
 export async function getPublicCatalog(): Promise<CatalogResponse> {

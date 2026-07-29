@@ -29,3 +29,11 @@ export type CatalogResponse = {
   products: Product[];
   source: "live" | "fallback";
 };
+
+export type CatalogHealth = {
+  ready: boolean;
+  service: string;
+  sheetName: string;
+  driveFolderName: string;
+  productCount: number;
+};

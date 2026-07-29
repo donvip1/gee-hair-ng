@@ -1,8 +1,8 @@
 import { products as fallbackProducts } from "@/lib/products";
 import type { CatalogHealth, CatalogResponse, Product } from "@/lib/types";
 
-const backendUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-const sharedSecret = process.env.APPS_SCRIPT_SHARED_SECRET;
+const backendUrl = process.env.GOOGLE_APPS_SCRIPT_URL?.trim();
+const sharedSecret = process.env.APPS_SCRIPT_SHARED_SECRET?.trim();
 
 export const isCatalogBackendConfigured = Boolean(backendUrl && sharedSecret);
 

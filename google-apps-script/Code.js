@@ -289,9 +289,9 @@ function parseRequest(event) {
 }
 
 function assertSecret(value) {
-  const expected = PropertiesService.getScriptProperties().getProperty("SHARED_SECRET");
+  const expected = String(PropertiesService.getScriptProperties().getProperty("SHARED_SECRET") || "").trim();
   if (!expected) throw new Error("SHARED_SECRET is not configured.");
-  if (String(value || "") !== expected) throw new Error("Unauthorized.");
+  if (String(value || "").trim() !== expected) throw new Error("Unauthorized.");
 }
 
 function parseArray(value) {

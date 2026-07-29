@@ -17,6 +17,14 @@ const ALLOWED_CATEGORIES = ["Straight", "Curls", "Waves"];
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
 
+function doGet() {
+  return json({
+    ok: true,
+    service: "Gee Hair NG catalog deployment probe",
+    release: CATALOG_RELEASE
+  });
+}
+
 function doPost(event) {
   try {
     const data = parseRequest(event);

@@ -11,6 +11,7 @@
  */
 
 const PRODUCT_SHEET_NAME = "Products";
+const CATALOG_RELEASE = "2026-07-29-auth-diagnostics";
 const PRODUCT_HEADERS = ["id", "slug", "name", "category", "texture", "description", "detailsJson", "image", "imagesJson", "minLength", "maxLength", "lengthStep", "colours", "bundleWeightGrams", "featured", "active", "imagePending", "updatedAt"];
 const ALLOWED_CATEGORIES = ["Straight", "Curls", "Waves"];
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -49,6 +50,7 @@ function healthCheck() {
   const folder = getDriveFolder();
   return {
     service: "Gee Hair NG catalog",
+    release: CATALOG_RELEASE,
     sheetName: sheet.getName(),
     driveFolderName: folder.getName(),
     productCount: rowsAsObjects(sheet).length,
@@ -290,8 +292,23 @@ function parseRequest(event) {
 
 function assertSecret(value) {
   const expected = String(PropertiesService.getScriptProperties().getProperty("SHARED_SECRET") || "").trim();
+  const received = String(value || "").trim();
   if (!expected) throw new Error("SHARED_SECRET is not configured.");
-  if (String(value || "").trim() !== expected) throw new Error("Unauthorized.");
+  if (received !== expected) {
+    throw new Error(`Unauthorized. Deployment ${CATALOG_RELEASE}; expected ${secretFingerprint(expected)}; received ${secretFingerprint(received)}.`);
+  }
+}
+
+function secretFingerprint(value) {
+  const normalized = String(value || "");
+  if (!normalized) return "empty";
+  const digest = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    normalized,
+    Utilities.Charset.UTF_8
+  );
+  const hex = digest.map(byte => (`0${((byte + 256) % 256).toString(16)}`).slice(-2)).join("");
+  return `${normalized.length}:${hex.slice(0, 10)}`;
 }
 
 function parseArray(value) {

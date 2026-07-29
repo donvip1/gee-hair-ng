@@ -33,7 +33,20 @@ export type CatalogResponse = {
 export type CatalogHealth = {
   ready: boolean;
   service: string;
+  release?: string;
   sheetName: string;
   driveFolderName: string;
   productCount: number;
+};
+
+export type CatalogProbe = {
+  ok: boolean;
+  service: string;
+  release: string;
+};
+
+export type CatalogEndpointInfo = {
+  host: string;
+  deploymentRef: string;
+  usesExecUrl: boolean;
 };

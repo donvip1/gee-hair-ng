@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 import { AdminNav } from "@/components/AdminNav";
 import type {
+  CatalogEndpointInfo,
   CatalogHealth,
+  CatalogProbe,
   Product,
   ProductCategory,
   ProductInput
@@ -25,6 +27,8 @@ type AdminCatalogResponse = {
   writable?: boolean;
   backendStatus?: Exclude<BackendStatus, "loading">;
   health?: CatalogHealth;
+  probe?: CatalogProbe;
+  endpoint?: CatalogEndpointInfo | null;
   error?: string;
 };
 
@@ -60,6 +64,8 @@ export default function AdminProductsPage() {
   const [writable, setWritable] = useState(false);
   const [backendStatus, setBackendStatus] = useState<BackendStatus>("loading");
   const [health, setHealth] = useState<CatalogHealth | null>(null);
+  const [probe, setProbe] = useState<CatalogProbe | null>(null);
+  const [endpoint, setEndpoint] = useState<CatalogEndpointInfo | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -76,6 +82,8 @@ export default function AdminProductsPage() {
       setBackendStatus(status);
       setWritable(Boolean(data.writable));
       setHealth(data.health ?? null);
+      setProbe(data.probe ?? null);
+      setEndpoint(data.endpoint ?? null);
       setProducts(data.products ?? []);
 
       if (status === "unconfigured") {
@@ -209,6 +217,8 @@ export default function AdminProductsPage() {
         <CatalogStatus
           status={backendStatus}
           health={health}
+          probe={probe}
+          endpoint={endpoint}
           productCount={products.length}
         />
         {message && <div className="success-panel">{message}</div>}
@@ -465,10 +475,14 @@ export default function AdminProductsPage() {
 function CatalogStatus({
   status,
   health,
+  probe,
+  endpoint,
   productCount
 }: {
   status: BackendStatus;
   health: CatalogHealth | null;
+  probe: CatalogProbe | null;
+  endpoint: CatalogEndpointInfo | null;
   productCount: number;
 }) {
   const label = {
@@ -477,6 +491,10 @@ function CatalogStatus({
     unhealthy: "Connection needs attention",
     ready: "Catalog connected"
   }[status];
+  const endpointLabel = endpoint
+    ? `${endpoint.host} · deployment …${endpoint.deploymentRef} · ${endpoint.usesExecUrl ? "/exec" : "invalid URL"}`
+    : "No Apps Script endpoint detected";
+  const release = health?.release ?? probe?.release;
 
   return (
     <div className={`catalog-status catalog-status-${status}`}>
@@ -490,6 +508,11 @@ function CatalogStatus({
               ? "Review the Apps Script deployment, Script Properties and matching Vercel variables."
               : "Contacting Google Apps Script…"}
       </p>
+      {status !== "loading" && (
+        <small className="catalog-endpoint-detail">
+          {endpointLabel}{release ? ` · release ${release}` : " · release probe unavailable"}
+        </small>
+      )}
     </div>
   );
 }

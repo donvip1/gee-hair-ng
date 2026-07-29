@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callCatalogBackend, getCatalogHealth, isCatalogBackendConfigured, normalizeProduct } from "@/lib/catalog-backend";
+import { callCatalogBackend, getCatalogEndpointInfo, getCatalogHealth, getCatalogProbe, isCatalogBackendConfigured, normalizeProduct } from "@/lib/catalog-backend";
 import { products as fallbackProducts } from "@/lib/products";
 import { hasValidAdminSession } from "@/lib/admin-auth";
 import type { Product, ProductInput } from "@/lib/types";
@@ -8,15 +8,24 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   if (!hasValidAdminSession(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!isCatalogBackendConfigured) return NextResponse.json({ products: fallbackProducts, source: "fallback", writable: false, backendStatus: "unconfigured" });
+  const endpoint = getCatalogEndpointInfo();
+  if (!isCatalogBackendConfigured) return NextResponse.json({ products: fallbackProducts, source: "fallback", writable: false, backendStatus: "unconfigured", endpoint });
+
+  let probe;
+  try {
+    probe = await getCatalogProbe();
+  } catch (error) {
+    return NextResponse.json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", endpoint, error: error instanceof Error ? error.message : "Unable to verify the Apps Script deployment" }, { status: 502 });
+  }
+
   try {
     const [health, data] = await Promise.all([
       getCatalogHealth(),
       callCatalogBackend<{ products: Product[] }>("listProducts", { includeInactive: true })
     ]);
-    return NextResponse.json({ products: data.products.map(normalizeProduct), source: "live", writable: health.ready, backendStatus: "ready", health });
+    return NextResponse.json({ products: data.products.map(normalizeProduct), source: "live", writable: health.ready, backendStatus: "ready", health, probe, endpoint });
   } catch (error) {
-    return NextResponse.json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", error: error instanceof Error ? error.message : "Unable to connect to the catalog backend" }, { status: 502 });
+    return NextResponse.json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", probe, endpoint, error: error instanceof Error ? error.message : "Unable to connect to the catalog backend" }, { status: 502 });
   }
 }
 

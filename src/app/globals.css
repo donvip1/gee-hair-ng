@@ -331,6 +331,7 @@ h1 em, h2 em { font-weight: 500; color: var(--copper); }
 .catalog-status { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 14px 16px; margin-bottom: 20px; border: 1px solid var(--line); background: white; }
 .catalog-status span { flex: 0 0 auto; text-transform: uppercase; letter-spacing: .12em; font-size: 9px; font-weight: 800; }
 .catalog-status p { margin: 0; color: var(--soft-ink); font-size: 12px; text-align: right; }
+.catalog-endpoint-detail { display: block; max-width: 100%; color: var(--soft-ink); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; line-height: 1.45; overflow-wrap: anywhere; text-align: right; }
 .catalog-status-ready { border-color: #b9ceb0; background: #f1f7ee; }
 .catalog-status-unconfigured { border-color: #d9c5a6; background: #fbf6ed; }
 .catalog-status-unhealthy { border-color: #dca9a2; background: #f8e6e3; }
@@ -384,7 +385,7 @@ h1 em, h2 em { font-weight: 500; color: var(--copper); }
   .admin-editor { padding: 22px 16px; }
   .upload-row { flex-direction: column; }
   .catalog-status { align-items: flex-start; flex-direction: column; gap: 6px; }
-  .catalog-status p { text-align: left; }
+  .catalog-status p, .catalog-endpoint-detail { text-align: left; }
   .admin-header-actions { width: 100%; }
   .admin-header-actions .button { flex: 1; }
 }

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, MessageCircle, MoveUpRight, Palette, Scale, Sparkles } from "lucide-react";
+import { ArrowRight, Check, MessageCircle, MoveUpRight, Scissors, SwatchBook, Weight } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { getPublicCatalog } from "@/lib/catalog-backend";
 import { business, whatsappLink } from "@/lib/business";
@@ -18,7 +18,7 @@ export default async function Home() {
           <h1>Beauty delivered. <em>Confidence unleashed.</em></h1>
           <p className="lead">Premium hair extensions in 100g bundles, available in your preferred inches and colour—with complimentary wigging for every first-time customer.</p>
           <div className="button-row"><Link className="button button-dark" href="/shop">Choose your hair <MoveUpRight size={17} /></Link><a className="text-link" href={whatsappLink("Hello Gee Hair NG, please help me choose the right hair texture and length.")} target="_blank" rel="noreferrer">Ask Gee on WhatsApp <ArrowRight size={15} /></a></div>
-          <div className="verified-offer"><Sparkles size={20} /><p><strong>First time ordering?</strong><br />Your wigging service is complimentary.</p></div>
+          <div className="verified-offer"><span className="service-icon service-icon-compact"><Scissors size={19} strokeWidth={1.6} /></span><p><strong>First time ordering?</strong><br />Your wigging service is complimentary.</p></div>
         </div>
         <div className="hero-gallery">
           <div className="hero-main-image"><Image src="/products/bouncy-curls.jpeg" alt="Gee Hair NG Bouncy Curls wig" fill priority sizes="(max-width: 800px) 90vw, 48vw" /><span className="vertical-caption">BOUNCY CURLS · 12–34 INCHES</span></div>
@@ -44,7 +44,7 @@ export default async function Home() {
         <div className="story-collage"><div className="story-images"><div className="story-tall"><Image src="/products/deep-waves.jpeg" alt="Gee Hair NG Deep Waves" fill sizes="50vw" /></div><div className="story-small"><Image src="/products/bone-straight.jpeg" alt="Gee Hair NG Bone Straight" fill sizes="30vw" /></div></div><p className="story-tagline">{business.tagline}.</p></div>
       </section>
 
-      <section className="service-facts"><article><Scale /><h3>100g bundles</h3><p>Each bundle is sold by weight, with 100 grams in every bundle.</p></article><article><Palette /><h3>All colours</h3><p>Tell Gee your preferred shade while configuring your WhatsApp order.</p></article><article><Sparkles /><h3>Free first-time wigging</h3><p>First-time customers can request complimentary wigging with their order.</p></article></section>
+      <section className="service-facts"><article><span className="service-icon"><Weight size={26} strokeWidth={1.5} /></span><h3>100g bundles</h3><p>Each bundle is sold by weight, with 100 grams in every bundle.</p></article><article><span className="service-icon"><SwatchBook size={26} strokeWidth={1.5} /></span><h3>All colours</h3><p>Tell Gee your preferred shade while configuring your WhatsApp order.</p></article><article><span className="service-icon"><Scissors size={26} strokeWidth={1.5} /></span><h3>Free first-time wigging</h3><p>First-time customers can request complimentary wigging with their order.</p></article></section>
 
       <section className="steps section page-shell" id="how-to-order"><div className="section-heading"><div><p className="eyebrow">Simple from selection to confirmation</p><h2>How to <em>order.</em></h2></div><p>No fake checkout and no hidden transaction page. Your configured request goes directly to the official Gee Hair NG WhatsApp.</p></div><div className="step-grid"><article><span>01</span><h3>Choose your texture</h3><p>Browse the current collection and open the product you want.</p></article><article><span>02</span><h3>Configure your hair</h3><p>Select inches, colour, number of 100g bundles and first-time wigging.</p></article><article><span>03</span><h3>Confirm on WhatsApp</h3><p>Gee confirms your price, availability, delivery and payment directly.</p></article></div></section>
 

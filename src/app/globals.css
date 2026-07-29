@@ -109,11 +109,6 @@ h1 em, h2 em { font-weight: 500; color: var(--copper); }
 .step-grid span { color: var(--copper); font-size: 10px; letter-spacing: .15em; }
 .step-grid h3 { font-family: var(--font-serif); font-size: 30px; margin: 26px 0 9px; }
 .step-grid p { color: var(--soft-ink); margin: 0; }
-.testimonial { background: var(--cream); text-align: center; padding: 110px 20px; }
-.stars { color: var(--copper); display: flex; justify-content: center; gap: 4px; }
-.stars svg { width: 13px; }
-.testimonial blockquote { max-width: 850px; margin: 28px auto; font-family: var(--font-serif); font-size: clamp(34px, 4vw, 58px); line-height: 1.06; }
-.testimonial p { font-size: 12px; }
 .contact-cta { padding-block: 100px; display: flex; justify-content: space-between; align-items: flex-end; gap: 50px; }
 .contact-cta h2 { max-width: 780px; }
 .contact-cta p:not(.eyebrow) { color: var(--soft-ink); }
@@ -293,7 +288,8 @@ h1 em, h2 em { font-weight: 500; color: var(--copper); }
 /* No-mock WhatsApp commerce revamp */
 .header-whatsapp { display: inline-flex !important; align-items: center; gap: 8px; background: var(--ink); color: white; padding: 10px 14px; font-size: 11px; font-weight: 700; }
 .verified-offer { display: flex; align-items: center; gap: 13px; margin-top: 42px; padding-top: 22px; border-top: 1px solid var(--line); }
-.verified-offer svg { color: var(--copper); }
+.service-icon { width: 54px; height: 54px; border: 1px solid rgba(158, 67, 44, .34); border-radius: 50%; display: inline-grid; place-items: center; color: var(--copper); background: rgba(252, 250, 246, .72); }
+.service-icon-compact { width: 42px; height: 42px; flex: 0 0 42px; }
 .verified-offer p { margin: 0; color: var(--soft-ink); font-size: 12px; line-height: 1.45; }
 .verified-offer strong { color: var(--ink); }
 .product-grid:has(.product-card:nth-child(5)) { grid-template-columns: repeat(5, 1fr); }
@@ -302,7 +298,6 @@ h1 em, h2 em { font-weight: 500; color: var(--copper); }
 .service-facts { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--cream); padding: 0 5%; }
 .service-facts article { padding: 70px 7vw; border-right: 1px solid var(--line); text-align: center; }
 .service-facts article:last-child { border: 0; }
-.service-facts svg { color: var(--copper); width: 28px; height: 28px; }
 .service-facts h3 { font-family: var(--font-serif); font-size: 29px; margin: 20px 0 8px; }
 .service-facts p { color: var(--soft-ink); margin: 0; }
 .config-summary { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--line); margin: 28px 0 12px; }

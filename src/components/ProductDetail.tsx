@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Check, MessageCircle, Minus, Plus, Sparkles } from "lucide-react";
+import { Check, MessageCircle, Minus, Plus, Scissors } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Product } from "@/lib/types";
 import { business, whatsappLink } from "@/lib/business";
@@ -55,7 +55,7 @@ export function ProductDetail({ product }: { product: Product }) {
         <div className="bundle-stepper"><button type="button" aria-label="Remove one bundle" onClick={() => setBundles(Math.max(1, bundles - 1))}><Minus size={17} /></button><strong>{bundles}</strong><span>{bundles === 1 ? "bundle" : "bundles"}</span><button type="button" aria-label="Add one bundle" onClick={() => setBundles(Math.min(12, bundles + 1))}><Plus size={17} /></button></div>
 
         <label className="check-option"><input type="checkbox" checked={firstTimer} onChange={(event) => { setFirstTimer(event.target.checked); if (!event.target.checked) setWigging(false); }} /><span><strong>I am a first-time customer</strong><small>You qualify for complimentary wigging.</small></span></label>
-        {firstTimer && <label className="check-option accent-option"><input type="checkbox" checked={wigging} onChange={(event) => setWigging(event.target.checked)} /><Sparkles size={19} /><span><strong>Yes, wig my hair for free</strong><small>Complimentary service for your first order.</small></span></label>}
+        {firstTimer && <label className="check-option accent-option"><input type="checkbox" checked={wigging} onChange={(event) => setWigging(event.target.checked)} /><Scissors size={19} strokeWidth={1.6} /><span><strong>Yes, wig my hair for free</strong><small>Complimentary service for your first order.</small></span></label>}
 
         <div className="option-label"><label htmlFor="notes">Anything else?</label><span>Optional</span></div>
         <textarea id="notes" className="config-input config-notes" value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Tell Gee about your preferred style, closure, frontal or deadline." />

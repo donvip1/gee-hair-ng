@@ -102,7 +102,7 @@ ADMIN_PASSWORD=your-private-owner-password
 SESSION_SECRET=a-different-long-random-session-secret
 GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
 APPS_SCRIPT_SHARED_SECRET=the-exact-SHARED_SECRET-from-Apps-Script
-NEXT_PUBLIC_SITE_URL=https://your-production-domain.example
+NEXT_PUBLIC_SITE_URL=https://www.geehairng.online
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=
 ```
 
@@ -112,7 +112,7 @@ Rules:
 - `SESSION_SECRET` should be different from `ADMIN_PASSWORD` and at least 32 random characters.
 - Apply the variables to **Production**. Apply them to **Preview** too if branch/preview deployments need a working admin CMS.
 - Never prefix the four private admin/CMS variables with `NEXT_PUBLIC_`; they must remain server-only.
-- `NEXT_PUBLIC_SITE_URL` is the public canonical production origin, without a trailing path. Set it to the custom domain when one is connected.
+- `NEXT_PUBLIC_SITE_URL` is the public canonical production origin, without a trailing path. Gee Hair NG uses `https://www.geehairng.online`; the apex domain redirects there.
 - `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` is optional and should contain only the Google verification token.
 - After adding or changing variables, redeploy the latest Vercel deployment. Existing deployments do not receive new environment values automatically.
 

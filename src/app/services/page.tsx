@@ -21,8 +21,22 @@ export default function ServicesPage() {
       </header>
       <ServicesShowcase />
       <section className="qr-contact" aria-labelledby="qr-heading">
-        <div><p className="eyebrow">Scan or tap</p><h2 id="qr-heading">Contact Gee on <em>WhatsApp.</em></h2><p>Scan the official QR code using your phone camera, or use the button to open a direct message. Confirm fees, timelines and all service terms before proceeding.</p><WhatsAppLink className="button button-dark" href={whatsappLink(`Hello ${business.name}, I would like to enquire about your other services.`)} eventName="general_whatsapp_enquiry" eventData={{ placement: "services_qr" }}><MessageCircle size={18} /> Message Gee Hair NG</WhatsAppLink></div>
-        <div className="qr-frame"><Image src="/brand/gee-hair-ng-whatsapp-qr.jpeg" alt="Official Gee Hair NG WhatsApp QR code" fill sizes="(max-width: 700px) 80vw, 360px" /></div>
+        <div className="qr-contact-copy">
+          <p className="eyebrow">Official WhatsApp contact</p>
+          <h2 id="qr-heading">Scan to message <em>Gee Hair NG.</em></h2>
+          <p>Open your phone camera and point it at the code. It directs you to the verified Gee Hair NG WhatsApp chat, where you can enquire about hair, importation, sourcing or contribution services.</p>
+          <dl className="qr-destination-details">
+            <div><dt>Destination</dt><dd>WhatsApp chat with Gee Hair NG</dd></div>
+            <div><dt>Official number</dt><dd>{business.phoneDisplay}</dd></div>
+            <div><dt>Business location</dt><dd>{business.shortLocation}</dd></div>
+          </dl>
+          <p className="qr-safety-note">Always confirm that WhatsApp displays <strong>{business.phoneDisplay}</strong> before sending a message or discussing a transaction.</p>
+          <WhatsAppLink className="button button-dark" href={whatsappLink(`Hello ${business.name}, I would like to enquire about your other services.`)} eventName="general_whatsapp_enquiry" eventData={{ placement: "services_qr" }}><MessageCircle size={18} /> Open official WhatsApp</WhatsAppLink>
+        </div>
+        <figure className="qr-card">
+          <div className="qr-frame"><Image src="/brand/gee-hair-ng-whatsapp-qr.png" alt={`QR code opening the official ${business.name} WhatsApp chat at ${business.phoneDisplay}`} fill sizes="(max-width: 700px) 78vw, 340px" /></div>
+          <figcaption><strong>Gee Hair NG on WhatsApp</strong><span>{business.phoneDisplay}</span><small>Scan with your phone camera</small></figcaption>
+        </figure>
       </section>
     </div>
   );

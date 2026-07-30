@@ -28,6 +28,8 @@ export type ProductInput = Omit<Product, "id" | "updatedAt"> & {
 export type CatalogResponse = {
   products: Product[];
   source: "live" | "fallback";
+  checkedAt: string;
+  status: "ready" | "unconfigured" | "degraded";
 };
 
 export type CatalogHealth = {

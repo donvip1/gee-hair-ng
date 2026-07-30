@@ -11,7 +11,7 @@
  */
 
 const PRODUCT_SHEET_NAME = "Products";
-const CATALOG_RELEASE = "2026-07-29-auth-diagnostics";
+const CATALOG_RELEASE = "2026-07-30-production-hardening";
 const PRODUCT_HEADERS = ["id", "slug", "name", "category", "texture", "description", "detailsJson", "image", "imagesJson", "minLength", "maxLength", "lengthStep", "colours", "bundleWeightGrams", "featured", "active", "imagePending", "updatedAt"];
 const ALLOWED_CATEGORIES = ["Straight", "Curls", "Waves"];
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -173,11 +173,19 @@ function validateProduct(raw) {
   if (!ALLOWED_CATEGORIES.includes(product.category)) throw new Error("Category must be Straight, Curls or Waves.");
   if (!product.texture) throw new Error("Texture is required.");
   if (!product.description) throw new Error("Description is required.");
-  if (!product.image) throw new Error("A product image is required.");
-  if (product.maxLength < product.minLength) throw new Error("Maximum length must be greater than or equal to minimum length.");
+  if (!product.image || !isAllowedImageUrl(product.image)) throw new Error("Use a local product image or a public Google Drive image URL.");
+  if (product.maxLength < product.minLength || product.maxLength > 60) throw new Error("Maximum length must be at least the minimum and no greater than 60 inches.");
   if ((product.maxLength - product.minLength) % product.lengthStep !== 0) throw new Error("The length range must divide evenly by the length step.");
+  if (product.bundleWeightGrams > 1000) throw new Error("Bundle weight must not exceed 1000 grams.");
   if (!product.images.length) product.images = [product.image];
+  if (product.images.some(image => !isAllowedImageUrl(image))) throw new Error("Every product image must use an approved public image URL.");
   return product;
+}
+
+function isAllowedImageUrl(value) {
+  const text = String(value || "");
+  if (/^\/products\/[a-zA-Z0-9._\/-]+$/.test(text)) return true;
+  return /^https:\/\/(drive\.google\.com|lh3\.googleusercontent\.com)\//.test(text);
 }
 
 function assertUniqueSlug(sheet, slug, currentId) {

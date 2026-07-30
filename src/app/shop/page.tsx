@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { ShopCatalog } from "@/components/ShopCatalog";
 import { getPublicCatalog } from "@/lib/catalog-backend";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Shop virgin hair textures in Abuja",
+  description: "Browse Gee Hair NG Bone Straight, Pixie Curls, Bouncy Curls, Deep Waves and Jerry Curls in 100g bundles, then configure your request for WhatsApp.",
+  alternates: { canonical: "/shop" }
+};
 
 export default async function ShopPage() {
   const { products } = await getPublicCatalog();

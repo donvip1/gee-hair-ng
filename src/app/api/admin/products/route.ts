@@ -2,62 +2,61 @@ import { NextRequest, NextResponse } from "next/server";
 import { callCatalogBackend, getCatalogEndpointInfo, getCatalogHealth, getCatalogProbe, isCatalogBackendConfigured, normalizeProduct } from "@/lib/catalog-backend";
 import { products as fallbackProducts } from "@/lib/products";
 import { hasValidAdminSession } from "@/lib/admin-auth";
-import type { Product, ProductInput } from "@/lib/types";
+import { validateProductInput } from "@/lib/product-validation";
+import { privateResponseHeaders, validateMutationRequest } from "@/lib/request-security";
+import type { Product } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  if (!hasValidAdminSession(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!hasValidAdminSession(request)) return json({ error: "Unauthorized" }, 401);
   const endpoint = getCatalogEndpointInfo();
-  if (!isCatalogBackendConfigured) return NextResponse.json({ products: fallbackProducts, source: "fallback", writable: false, backendStatus: "unconfigured", endpoint });
+  if (!isCatalogBackendConfigured) return json({ products: fallbackProducts, source: "fallback", writable: false, backendStatus: "unconfigured", endpoint });
 
   let probe;
-  try {
-    probe = await getCatalogProbe();
-  } catch (error) {
-    return NextResponse.json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", endpoint, error: error instanceof Error ? error.message : "Unable to verify the Apps Script deployment" }, { status: 502 });
-  }
+  try { probe = await getCatalogProbe(); }
+  catch (error) { return json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", endpoint, error: message(error, "Unable to verify the Apps Script deployment") }, 502); }
 
   try {
-    const [health, data] = await Promise.all([
-      getCatalogHealth(),
-      callCatalogBackend<{ products: Product[] }>("listProducts", { includeInactive: true })
-    ]);
-    return NextResponse.json({ products: data.products.map(normalizeProduct), source: "live", writable: health.ready, backendStatus: "ready", health, probe, endpoint });
+    const [health, data] = await Promise.all([getCatalogHealth(), callCatalogBackend<{ products: Product[] }>("listProducts", { includeInactive: true })]);
+    return json({ products: data.products.map(normalizeProduct), source: "live", writable: health.ready, backendStatus: "ready", health, probe, endpoint });
   } catch (error) {
-    return NextResponse.json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", probe, endpoint, error: error instanceof Error ? error.message : "Unable to connect to the catalog backend" }, { status: 502 });
+    return json({ products: [], source: "live", writable: false, backendStatus: "unhealthy", probe, endpoint, error: message(error, "Unable to connect to the catalog backend") }, 502);
   }
 }
 
 export async function POST(request: NextRequest) {
-  if (!hasValidAdminSession(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!isCatalogBackendConfigured) return NextResponse.json({ error: "Connect Google Apps Script before changing products." }, { status: 503 });
-  const product = await request.json() as ProductInput;
-  const error = validateProduct(product);
-  if (error) return NextResponse.json({ error }, { status: 400 });
+  if (!hasValidAdminSession(request)) return json({ error: "Unauthorized" }, 401);
+  const requestError = validateMutationRequest(request);
+  if (requestError) return json({ error: requestError }, 415);
+  if (!isCatalogBackendConfigured) return json({ error: "Connect Google Apps Script before changing products." }, 503);
+  let body: unknown;
+  try { body = await request.json(); } catch { return json({ error: "Request body must be valid JSON." }, 400); }
+  const validation = validateProductInput(body);
+  if (!validation.ok) return json({ error: validation.error }, 400);
   try {
-    const data = await callCatalogBackend<{ product: Product }>("saveProduct", { product });
-    return NextResponse.json({ product: normalizeProduct(data.product) });
-  } catch (cause) { return NextResponse.json({ error: cause instanceof Error ? cause.message : "Unable to save product" }, { status: 502 }); }
+    const data = await callCatalogBackend<{ product: Product }>("saveProduct", { product: validation.product });
+    return json({ product: normalizeProduct(data.product) });
+  } catch (error) { return json({ error: message(error, "Unable to save product") }, 502); }
 }
 
 export async function DELETE(request: NextRequest) {
-  if (!hasValidAdminSession(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!isCatalogBackendConfigured) return NextResponse.json({ error: "Connect Google Apps Script before deleting products." }, { status: 503 });
-  const { id } = await request.json() as { id?: string };
-  if (!id) return NextResponse.json({ error: "Product ID is required." }, { status: 400 });
-  try { await callCatalogBackend("deleteProduct", { id }); return NextResponse.json({ ok: true }); }
-  catch (cause) { return NextResponse.json({ error: cause instanceof Error ? cause.message : "Unable to delete product" }, { status: 502 }); }
+  if (!hasValidAdminSession(request)) return json({ error: "Unauthorized" }, 401);
+  const requestError = validateMutationRequest(request);
+  if (requestError) return json({ error: requestError }, 415);
+  if (!isCatalogBackendConfigured) return json({ error: "Connect Google Apps Script before deleting products." }, 503);
+  let body: { id?: string };
+  try { body = await request.json() as { id?: string }; } catch { return json({ error: "Request body must be valid JSON." }, 400); }
+  const id = body.id?.trim();
+  if (!id || id.length > 100) return json({ error: "A valid product ID is required." }, 400);
+  try { await callCatalogBackend("deleteProduct", { id }); return json({ ok: true }); }
+  catch (error) { return json({ error: message(error, "Unable to delete product") }, 502); }
 }
 
-function validateProduct(product: ProductInput) {
-  if (!product.name?.trim()) return "Product name is required.";
-  if (!product.slug?.trim() || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.slug)) return "Use a lowercase URL slug with letters, numbers and single hyphens.";
-  if (!product.texture?.trim()) return "Texture is required.";
-  if (!product.description?.trim()) return "Description is required.";
-  if (!product.image?.trim()) return "A product image is required.";
-  if (!Number.isInteger(product.minLength) || !Number.isInteger(product.maxLength) || product.minLength < 1 || product.maxLength < product.minLength) return "Enter a valid whole-number length range.";
-  if (!Number.isInteger(product.lengthStep) || product.lengthStep < 1 || (product.maxLength - product.minLength) % product.lengthStep !== 0) return "Length step must be a positive whole number that fits the length range.";
-  if (!Number.isInteger(product.bundleWeightGrams) || product.bundleWeightGrams < 1) return "Bundle weight must be a positive whole number.";
-  return null;
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, { status, headers: privateResponseHeaders });
+}
+
+function message(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
 }

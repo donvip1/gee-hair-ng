@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, MessageCircle, MoveUpRight, Scissors, SwatchBook, Weight } from "lucide-react";
+import { CustomerGuidance } from "@/components/CustomerGuidance";
 import { ProductCard } from "@/components/ProductCard";
+import { ServicesShowcase } from "@/components/ServicesShowcase";
+import { WhatsAppLink } from "@/components/WhatsAppLink";
 import { getPublicCatalog } from "@/lib/catalog-backend";
 import { business, whatsappLink } from "@/lib/business";
 
@@ -16,8 +19,8 @@ export default async function Home() {
         <div className="hero-copy">
           <p className="eyebrow">100% virgin hair · Abuja, Nigeria</p>
           <h1>Beauty delivered. <em>Confidence unleashed.</em></h1>
-          <p className="lead">Premium hair extensions in 100g bundles, available in your preferred inches and colour—with complimentary wigging for every first-time customer.</p>
-          <div className="button-row"><Link className="button button-dark" href="/shop">Choose your hair <MoveUpRight size={17} /></Link><a className="text-link" href={whatsappLink("Hello Gee Hair NG, please help me choose the right hair texture and length.")} target="_blank" rel="noreferrer">Ask Gee on WhatsApp <ArrowRight size={15} /></a></div>
+          <p className="lead">At Gee Hair NG, we believe great hair is more than a look—it&apos;s confidence in every strand. We curate premium-quality human hair known for its beauty, durability and natural finish, ensuring every customer enjoys luxury without compromise, supported by exceptional service and trusted nationwide delivery.</p>
+          <div className="button-row"><Link className="button button-dark" href="/shop">Choose your hair <MoveUpRight size={17} /></Link><WhatsAppLink className="text-link" href={whatsappLink("Hello Gee Hair NG, please help me choose the right hair texture and length.")} eventName="general_whatsapp_enquiry" eventData={{ placement: "hero" }}>Ask Gee on WhatsApp <ArrowRight size={15} /></WhatsAppLink></div>
           <div className="verified-offer"><span className="service-icon service-icon-compact"><Scissors size={19} strokeWidth={1.6} /></span><p><strong>First time ordering?</strong><br />Your wigging service is complimentary.</p></div>
         </div>
         <div className="hero-gallery">
@@ -40,7 +43,7 @@ export default async function Home() {
       </section>
 
       <section className="story section page-shell" id="story">
-        <div className="story-copy"><p className="eyebrow">The Gee Hair difference</p><h2>Confidence you can <em>wear.</em></h2><p>Gee Hair NG supplies 100% virgin hair extensions in different textures, lengths and colours. Every bundle weighs 100g, so you always know exactly what you are selecting.</p><p>The service remains personal from first enquiry to final confirmation: you configure what you want in the app and continue the conversation directly with Gee on WhatsApp.</p><a className="text-link" href={whatsappLink("Hello Gee Hair NG, I would like to learn more about your 100% virgin hair.")} target="_blank" rel="noreferrer">Talk to Gee Hair NG <ArrowRight size={15} /></a></div>
+        <div className="story-copy"><p className="eyebrow">The Gee Hair difference</p><h2>Confidence you can <em>wear.</em></h2><p>Gee Hair NG supplies 100% virgin hair extensions in different textures, lengths and colours. Every bundle weighs 100g, so you always know exactly what you are selecting.</p><p>The service remains personal from first enquiry to final confirmation: you configure what you want in the app and continue the conversation directly with Gee on WhatsApp.</p><WhatsAppLink className="text-link" href={whatsappLink("Hello Gee Hair NG, I would like to learn more about your 100% virgin hair.")} eventName="general_whatsapp_enquiry" eventData={{ placement: "story" }}>Talk to Gee Hair NG <ArrowRight size={15} /></WhatsAppLink></div>
         <div className="story-collage"><div className="story-images"><div className="story-tall"><Image src="/products/deep-waves.jpeg" alt="Gee Hair NG Deep Waves" fill sizes="50vw" /></div><div className="story-small"><Image src="/products/bone-straight.jpeg" alt="Gee Hair NG Bone Straight" fill sizes="30vw" /></div></div><p className="story-tagline">{business.tagline}.</p></div>
       </section>
 
@@ -48,7 +51,11 @@ export default async function Home() {
 
       <section className="steps section page-shell" id="how-to-order"><div className="section-heading"><div><p className="eyebrow">Simple from selection to confirmation</p><h2>How to <em>order.</em></h2></div><p>No fake checkout and no hidden transaction page. Your configured request goes directly to the official Gee Hair NG WhatsApp.</p></div><div className="step-grid"><article><span>01</span><h3>Choose your texture</h3><p>Browse the current collection and open the product you want.</p></article><article><span>02</span><h3>Configure your hair</h3><p>Select inches, colour, number of 100g bundles and first-time wigging.</p></article><article><span>03</span><h3>Confirm on WhatsApp</h3><p>Gee confirms your price, availability, delivery and payment directly.</p></article></div></section>
 
-      <section className="contact-cta page-shell"><div><p className="eyebrow">Personal service, one message away</p><h2>Let’s find your <em>next look.</em></h2><p>Questions, colour requests or ready to order? Message Gee Hair NG directly.</p></div><a className="button button-dark" href={whatsappLink("Hello Gee Hair NG, I would like to make an enquiry.")} target="_blank" rel="noreferrer"><MessageCircle size={18} /> Chat on WhatsApp</a></section>
+      <div className="page-shell"><ServicesShowcase compact /><div className="services-view-all"><Link className="button button-dark" href="/services">Explore all other services <MoveUpRight size={17} /></Link></div></div>
+
+      <div className="page-shell"><CustomerGuidance compact /></div>
+
+      <section className="contact-cta page-shell"><div><p className="eyebrow">Personal service, one message away</p><h2>Let’s find your <em>next look.</em></h2><p>Questions, colour requests or ready to order? Message Gee Hair NG directly.</p></div><WhatsAppLink className="button button-dark" href={whatsappLink("Hello Gee Hair NG, I would like to make an enquiry.")} eventName="general_whatsapp_enquiry" eventData={{ placement: "home_footer_cta" }}><MessageCircle size={18} /> Chat on WhatsApp</WhatsAppLink></section>
     </>
   );
 }

@@ -3,12 +3,13 @@ import type { CatalogEndpointInfo, CatalogHealth, CatalogProbe, CatalogResponse,
 
 const backendUrl = process.env.GOOGLE_APPS_SCRIPT_URL?.trim();
 const sharedSecret = process.env.APPS_SCRIPT_SHARED_SECRET?.trim();
+const REQUEST_TIMEOUT_MS = 12_000;
 
 export const isCatalogBackendConfigured = Boolean(backendUrl && sharedSecret);
 
 export async function callCatalogBackend<T>(action: string, payload: Record<string, unknown> = {}): Promise<T> {
   if (!backendUrl || !sharedSecret) throw new Error("Catalog backend is not configured.");
-  const response = await fetch(backendUrl, {
+  const response = await fetchWithTimeout(backendUrl, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify({ action, ...payload, sharedSecret }),
@@ -27,7 +28,7 @@ export async function getCatalogHealth() {
 
 export async function getCatalogProbe(): Promise<CatalogProbe> {
   if (!backendUrl) throw new Error("Catalog backend URL is not configured.");
-  const response = await fetch(backendUrl, { method: "GET", cache: "no-store" });
+  const response = await fetchWithTimeout(backendUrl, { method: "GET", cache: "no-store" });
   const text = await response.text();
   let data: unknown;
   try { data = JSON.parse(text); } catch { throw new Error("The configured Apps Script URL does not expose the current deployment probe."); }
@@ -40,31 +41,22 @@ export function getCatalogEndpointInfo(): CatalogEndpointInfo | null {
   try {
     const url = new URL(backendUrl);
     const deploymentId = url.pathname.match(/\/s\/([^/]+)\/exec\/?$/)?.[1] ?? "unknown";
-    return {
-      host: url.host,
-      deploymentRef: deploymentId === "unknown" ? "unknown" : deploymentId.slice(-10),
-      usesExecUrl: /\/exec\/?$/.test(url.pathname)
-    };
+    return { host: url.host, deploymentRef: deploymentId === "unknown" ? "unknown" : deploymentId.slice(-10), usesExecUrl: /\/exec\/?$/.test(url.pathname) };
   } catch {
     return { host: "invalid", deploymentRef: "invalid", usesExecUrl: false };
   }
 }
 
 export async function getPublicCatalog(): Promise<CatalogResponse> {
-  if (!isCatalogBackendConfigured) {
-    return { products: fallbackProducts, source: "fallback" };
-  }
+  const checkedAt = new Date().toISOString();
+  if (!isCatalogBackendConfigured) return { products: fallbackProducts, source: "fallback", checkedAt, status: "unconfigured" };
 
   try {
     const data = await callCatalogBackend<{ products: Product[] }>("listProducts");
-    return {
-      products: data.products
-        .map(normalizeProduct)
-        .filter((product) => product.active),
-      source: "live"
-    };
-  } catch {
-    return { products: fallbackProducts, source: "fallback" };
+    return { products: data.products.map(normalizeProduct).filter((product) => product.active), source: "live", checkedAt, status: "ready" };
+  } catch (error) {
+    logCatalogFailure("public_catalog_fallback", error);
+    return { products: fallbackProducts, source: "fallback", checkedAt, status: "degraded" };
   }
 }
 
@@ -76,15 +68,18 @@ export async function getPublicProduct(slug: string) {
 export function normalizeProduct(input: Product): Product {
   return {
     ...input,
-    minLength: Number(input.minLength),
-    maxLength: Number(input.maxLength),
-    lengthStep: Number(input.lengthStep || 2),
-    bundleWeightGrams: Number(input.bundleWeightGrams || 100),
-    featured: Boolean(input.featured),
-    active: Boolean(input.active),
-    imagePending: Boolean(input.imagePending),
+    minLength: Number(input.minLength), maxLength: Number(input.maxLength), lengthStep: Number(input.lengthStep || 2),
+    bundleWeightGrams: Number(input.bundleWeightGrams || 100), featured: Boolean(input.featured), active: Boolean(input.active), imagePending: Boolean(input.imagePending),
     images: Array.isArray(input.images) && input.images.length ? input.images : [input.image]
   };
+}
+
+function fetchWithTimeout(url: string, init: RequestInit) {
+  return fetch(url, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+}
+
+function logCatalogFailure(event: string, error: unknown) {
+  console.error(JSON.stringify({ level: "error", service: "catalog", event, message: error instanceof Error ? error.message : "Unknown catalog failure", at: new Date().toISOString() }));
 }
 
 function isBackendSuccess(value: unknown): value is { ok: true } { return typeof value === "object" && value !== null && "ok" in value && value.ok === true; }

@@ -13,9 +13,9 @@ export function hasValidAdminSession(request: NextRequest) {
   const token = request.cookies.get(COOKIE_NAME)?.value;
   if (!secret || !token) return false;
   const [payload, signature, extra] = token.split(".");
-  if (!payload || !signature || extra) return false;
-  const expires = Number(payload.split(":")[1]);
-  if (!expires || expires < Date.now()) return false;
+  if (!payload || !signature || extra || !/^admin:\d{13}$/.test(payload)) return false;
+  const expires = Number(payload.slice("admin:".length));
+  if (!expires || expires < Date.now() || expires > Date.now() + 8 * 60 * 60_000 + 60_000) return false;
   const expected = createHmac("sha256", secret).update(payload).digest("hex");
   const actualBuffer = Buffer.from(signature);
   const expectedBuffer = Buffer.from(expected);

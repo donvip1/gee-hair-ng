@@ -15,6 +15,10 @@ A mobile-first Next.js, React and TypeScript catalog for Gee Hair NG. Customers 
 - 100% virgin hair, 100g per bundle, all colours available.
 - Complimentary wigging for first-time customers.
 - Price on request; Gee confirms price, availability, delivery and payment on WhatsApp.
+- Other Services page for importation, procurement, sourcing, coaching and contribution enquiries, with the official WhatsApp QR code.
+- Vercel Web Analytics and Speed Insights with privacy-conscious conversion events.
+- Search metadata, sitemap, robots rules, social-sharing image and structured business/product data.
+- Protected admin catalog-health diagnostics, secure sign-out and hardened mutation validation.
 
 There are no fake customer accounts, order tracking records, checkout transactions, orders, sales statistics, reviews or inventory values in the app.
 
@@ -98,6 +102,8 @@ ADMIN_PASSWORD=your-private-owner-password
 SESSION_SECRET=a-different-long-random-session-secret
 GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
 APPS_SCRIPT_SHARED_SECRET=the-exact-SHARED_SECRET-from-Apps-Script
+NEXT_PUBLIC_SITE_URL=https://your-production-domain.example
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=
 ```
 
 Rules:
@@ -105,7 +111,9 @@ Rules:
 - `APPS_SCRIPT_SHARED_SECRET` must exactly match the Apps Script `SHARED_SECRET` property.
 - `SESSION_SECRET` should be different from `ADMIN_PASSWORD` and at least 32 random characters.
 - Apply the variables to **Production**. Apply them to **Preview** too if branch/preview deployments need a working admin CMS.
-- Never prefix these variables with `NEXT_PUBLIC_`; they must remain server-only.
+- Never prefix the four private admin/CMS variables with `NEXT_PUBLIC_`; they must remain server-only.
+- `NEXT_PUBLIC_SITE_URL` is the public canonical production origin, without a trailing path. Set it to the custom domain when one is connected.
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` is optional and should contain only the Google verification token.
 - After adding or changing variables, redeploy the latest Vercel deployment. Existing deployments do not receive new environment values automatically.
 
 ### E. Verify the live CMS
@@ -134,14 +142,19 @@ The optional command `npx plugins add vercel/vercel-plugin` installs guidance fo
 ## Deploy on Vercel
 
 1. Import `https://github.com/donvip1/gee-hair-ng` into Vercel.
-2. Add `ADMIN_PASSWORD`, `SESSION_SECRET`, `GOOGLE_APPS_SCRIPT_URL` and `APPS_SCRIPT_SHARED_SECRET` as described above.
-3. Deploy or redeploy after the environment variables have been saved.
-4. Verify `/admin/login`, `/admin/products`, `/shop` and a complete WhatsApp product request on the deployed URL.
+2. Add the private admin/CMS variables plus `NEXT_PUBLIC_SITE_URL` as described above.
+3. Enable Web Analytics and Speed Insights in the Vercel project dashboard.
+4. Deploy or redeploy after the environment variables have been saved.
+5. Verify `/admin/login`, `/admin/products`, `/services`, `/customer-care`, `/shop` and a complete WhatsApp product/service request on the deployed URL.
+6. In the protected admin dashboard, confirm the production-health panel reports the expected deployment and Apps Script release.
 
 ## Checks
 
 ```bash
+npm test
 npm run typecheck
 npm run lint
 npm run build
 ```
+
+The same checks run automatically on pushes and pull requests through `.github/workflows/quality.yml`.
